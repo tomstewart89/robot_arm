@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<robot name="robot_arm">
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 -0.015" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.04" length="0.03"/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="upper_arm">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/upper_arm.stl"/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="arm">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/arm.stl"/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="forearm">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/forearm.stl"/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="hand">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/hand.stl"/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="fingers">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/fingers.stl"/>
+            </geometry>
+        </visual>
+    </link>
+    <joint name="shoulder_psi" type="continuous">
+        <parent link="base_link"/>
+        <child link="upper_arm"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz = "0 0 1"/>
+    </joint>
+    <joint name="shoulder_theta" type="continuous">
+        <parent link="upper_arm"/>
+        <child link="arm"/>
+        <origin xyz="0 0 0.014195"/>
+        <axis xyz = "0 1 0"/>
+    </joint>
+    <joint name="elbow" type="continuous">
+        <parent link="arm"/>
+        <child link="forearm"/>
+        <origin xyz="0 0 0.0912"/>
+        <axis xyz = "0 1 0"/>
+    </joint>
+    <joint name="wrist_theta" type="continuous">
+        <parent link="forearm"/>
+        <child link="hand"/>
+        <origin xyz="0 0 0.0912"/>
+        <axis xyz = "0 -1 0"/>
+    </joint>
+    <joint name="wrist_psi" type="continuous">
+        <parent link="hand"/>
+        <child link="fingers"/>
+        <origin xyz="-0.0284 -0.013296 0.041274"/>
+        <axis xyz = "0 0 1"/>
+    </joint>
+</robot>
