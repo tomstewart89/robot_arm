@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot name="robot_arm">
-    <link name="base_link">
+    <link name="base">
         <visual>
             <origin xyz="0 0 -0.015" rpy="0 0 0"/>
             <geometry>
@@ -49,7 +49,7 @@
         </visual>
     </link>
     <joint name="shoulder_psi" type="continuous">
-        <parent link="base_link"/>
+        <parent link="base"/>
         <child link="upper_arm"/>
         <origin xyz="0 0 0"/>
         <axis xyz = "0 0 1"/>
@@ -64,13 +64,13 @@
         <parent link="arm"/>
         <child link="forearm"/>
         <origin xyz="0 0 0.0912"/>
-        <axis xyz = "0 1 0"/>
+        <axis xyz = "0 -1 0"/>
     </joint>
     <joint name="wrist_theta" type="continuous">
         <parent link="forearm"/>
         <child link="hand"/>
         <origin xyz="0 0 0.0912"/>
-        <axis xyz = "0 -1 0"/>
+        <axis xyz = "0 1 0"/>
     </joint>
     <joint name="wrist_psi" type="continuous">
         <parent link="hand"/>
