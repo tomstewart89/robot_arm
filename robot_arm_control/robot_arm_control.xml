@@ -1,0 +1,9 @@
+<library path="robot_arm_control">
+  <class name="robot_arm_control/RobotArmPositionOnlyHardware"
+         type="robot_arm_control::RobotArmPositionOnlyHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      The ROS2 Control minimal robot protocol. This is example for start porting the robot from ROS 1.
+    </description>
+  </class>
+</library>
