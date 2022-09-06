@@ -7,6 +7,12 @@
                 <cylinder radius="0.04" length="0.03"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 -0.015" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.04" length="0.03"/>
+            </geometry>
+        </collision>
     </link>
     <link name="upper_arm">
         <visual>
@@ -15,6 +21,12 @@
                 <mesh filename="package://robot_arm_description/models/upper_arm.stl"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/upper_arm.stl"/>
+            </geometry>
+        </collision>
     </link>
     <link name="arm">
         <visual>
@@ -23,6 +35,12 @@
                 <mesh filename="package://robot_arm_description/models/arm.stl"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/arm.stl"/>
+            </geometry>
+        </collision>
     </link>
     <link name="forearm">
         <visual>
@@ -31,6 +49,12 @@
                 <mesh filename="package://robot_arm_description/models/forearm.stl"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/forearm.stl"/>
+            </geometry>
+        </collision>
     </link>
     <link name="hand">
         <visual>
@@ -39,6 +63,12 @@
                 <mesh filename="package://robot_arm_description/models/hand.stl"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/hand.stl"/>
+            </geometry>
+        </collision>
     </link>
     <link name="fingers">
         <visual>
@@ -47,6 +77,12 @@
                 <mesh filename="package://robot_arm_description/models/fingers.stl"/>
             </geometry>
         </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/fingers.stl"/>
+            </geometry>
+        </collision>
     </link>
     <joint name="shoulder_psi" type="continuous">
         <parent link="base"/>

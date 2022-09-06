@@ -1,0 +1,8 @@
+# Default initial positions for robot_arm's ros2_control fake system
+
+initial_positions:
+  elbow: 0
+  shoulder_psi: 0
+  shoulder_theta: 0
+  wrist_psi: 0
+  wrist_theta: 0
