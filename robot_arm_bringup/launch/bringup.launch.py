@@ -1,13 +1,12 @@
-from ament_index_python.packages import get_package_share_path
-
+import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
-from launch.substitutions import Command, LaunchConfiguration
-from launch_ros.parameter_descriptions import ParameterValue
+from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
-import os
 
 
 def generate_launch_description():
@@ -21,16 +20,55 @@ def generate_launch_description():
         .to_moveit_configs()
     )
 
-    # ros2_control using FakeSystem as hardware
-    ros2_controllers_path = os.path.join(
-        get_package_share_directory("robot_arm_moveit_config"),
-        "config",
-        "ros2_controllers.yaml",
+    move_group_node = Node(
+        package="moveit_ros_move_group",
+        executable="move_group",
+        output="screen",
+        parameters=[moveit_config.to_dict()],
+        arguments=["--ros-args", "--log-level", "info"],
     )
+
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="log",
+        arguments=["-d", os.path.join(get_package_share_directory("robot_arm_moveit_config"), "launch", "moveit.rviz")],
+        parameters=[
+            moveit_config.robot_description,
+            moveit_config.robot_description_semantic,
+            moveit_config.planning_pipelines,
+            moveit_config.robot_description_kinematics,
+        ],
+    )
+
+    static_tf_node = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_transform_publisher",
+        output="log",
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base"],
+    )
+
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        output="both",
+        parameters=[moveit_config.robot_description],
+    )
+
     ros2_control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[moveit_config.robot_description, ros2_controllers_path],
+        parameters=[
+            moveit_config.robot_description,
+            os.path.join(
+                get_package_share_directory("robot_arm_moveit_config"),
+                "config",
+                "ros2_controllers.yaml",
+            ),
+        ],
         output="screen",
     )
 
@@ -52,6 +90,10 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            rviz_node,
+            static_tf_node,
+            robot_state_publisher,
+            move_group_node,
             ros2_control_node,
             joint_state_broadcaster_spawner,
             robot_arm_controller_spawner,
