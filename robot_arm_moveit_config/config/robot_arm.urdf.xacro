@@ -8,7 +8,6 @@
     <!-- Import control_xacro -->
     <xacro:include filename="robot_arm.ros2_control.xacro" />
 
-
     <xacro:robot_arm_ros2_control name="RobotArmPositionOnlyHardware" initial_positions_file="$(arg initial_positions_file)"/>
 
 </robot>

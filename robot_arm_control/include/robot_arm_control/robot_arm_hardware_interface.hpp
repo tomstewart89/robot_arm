@@ -22,6 +22,7 @@
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -36,15 +37,29 @@ class RobotArmPositionOnlyHardware : public hardware_interface::SystemInterface
 
     hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo &info) override;
 
-    hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
+    std::vector<hardware_interface::StateInterface> export_state_interfaces() override
+    {
+        std::vector<hardware_interface::StateInterface> state_interfaces;
+        for (uint i = 0; i < info_.joints.size(); i++)
+        {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &states_[i]));
+        }
 
-    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+        return state_interfaces;
+    }
 
-    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+    std::vector<hardware_interface::CommandInterface> export_command_interfaces() override
+    {
+        std::vector<hardware_interface::CommandInterface> command_interfaces;
+        for (uint i = 0; i < info_.joints.size(); i++)
+        {
+            command_interfaces.emplace_back(hardware_interface::CommandInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &commands_[i]));
+        }
 
-    hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
-
-    hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
+        return command_interfaces;
+    }
 
     hardware_interface::return_type read(const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
@@ -54,13 +69,8 @@ class RobotArmPositionOnlyHardware : public hardware_interface::SystemInterface
     std::shared_ptr<SerialPort> serial_;
     std::vector<Cds5500> servos_;
 
-    double hw_start_sec_;
-    double hw_stop_sec_;
-    double hw_slowdown_;
-
-    // Store the command for the simulated robot
-    std::vector<double> hw_commands_;
-    std::vector<double> hw_states_;
+    std::vector<double> commands_;
+    std::vector<double> states_;
 };
 
 }  // namespace robot_arm_control
