@@ -25,6 +25,8 @@ hardware_interface::CallbackReturn RobotArmPositionOnlyHardware::on_init(const h
     states_.resize(info_.joints.size(), 0.0);
     commands_.resize(info_.joints.size(), 0.0);
 
+    broadcast_ = std::make_unique<robot_arm_control::Cds5500>(serial_, "broadcast", 0xfe, 0.0);
+
     for (const auto &joint : info_.joints)
     {
         // RobotArmPositionOnlyHardware has exactly one state and command interface on each joint
@@ -64,22 +66,18 @@ hardware_interface::CallbackReturn RobotArmPositionOnlyHardware::on_init(const h
                              std::stod(joint.parameters.at("offset")));
     }
 
+    for (std::size_t i = 0; i < servos_.size(); ++i)
+    {
+        servos_[i].queue_move(commands_[i]);
+    }
+
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::return_type RobotArmPositionOnlyHardware::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
-    for (auto &servo : servos_)
-    {
-        servo.request_update();
-        rclcpp::sleep_for(std::chrono::nanoseconds(10000));
-    }
-
-    auto data = serial_->read();
-
     for (std::size_t i = 0; i < servos_.size(); ++i)
     {
-        servos_[i].on_read(data);
         states_[i] = servos_[i].get_position();
     }
 
@@ -90,9 +88,11 @@ hardware_interface::return_type RobotArmPositionOnlyHardware::write(const rclcpp
 {
     for (std::size_t i = 0; i < servos_.size(); ++i)
     {
-        servos_[i].set_position(commands_[i]);
-        rclcpp::sleep_for(std::chrono::nanoseconds(10000));
+        servos_[i].queue_move(commands_[i], 0.5);
     }
+
+    broadcast_->execute();
+    servos_[0].ping();  // not clear why this is necessary but go figure.
 
     return hardware_interface::return_type::OK;
 }

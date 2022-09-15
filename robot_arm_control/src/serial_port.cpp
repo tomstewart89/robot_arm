@@ -8,37 +8,31 @@ using namespace boost::asio;
 namespace robot_arm_control
 {
 
-SerialPort::SerialPort(const std::string& port_name, const int baudrate) : serial_(io_, port_name)
+SerialPort::SerialPort(const std::string& port_name, const int baudrate) : serial_(io_, port_name), timeout_(io_)
 {
     serial_.set_option(serial_port_base::baud_rate(baudrate));
-
-    serial_.async_read_some(
-        buffer(buffer_.data(), buffer_.size()),
-        boost::bind(&SerialPort::on_read, this, placeholders::error, placeholders::bytes_transferred));
-
-    std::thread t([this]() { io_.run(); });
-    thread_.swap(t);
 }
 
-SerialPort::~SerialPort()
+void SerialPort::write(const std::vector<uint8_t>& data)
 {
-    serial_.cancel();
-    thread_.join();
+    boost::asio::write(serial_, buffer(data.data(), data.size()));
 }
 
-void SerialPort::write(const std::vector<uint8_t>& packet)
-{
-    boost::asio::write(serial_, buffer(packet.data(), packet.size()));
-}
+void SerialPort::flush() { read(buffer_.size(), 0); }
 
-std::vector<uint8_t> SerialPort::read()
+std::vector<uint8_t> SerialPort::read(std::size_t len, const unsigned int timeout_ms)
 {
+    timeout_.expires_from_now(boost::posix_time::milliseconds(timeout_ms));
+    timeout_.async_wait(boost::bind(&SerialPort::on_timeout, this, placeholders::error));
+
+    serial_.async_read_some(buffer(buffer_.data(), len), boost::bind(&SerialPort::on_read, this, placeholders::error,
+                                                                     placeholders::bytes_transferred));
+
+    io_.run();
+    io_.reset();
+
     std::vector<uint8_t> out;
-
-    {
-        std::lock_guard<std::mutex> l(read_queue_mutex_);
-        read_queue_.swap(out);
-    }
+    read_queue_.swap(out);
 
     return out;
 }
@@ -47,14 +41,16 @@ void SerialPort::on_read(const boost::system::error_code& error, std::size_t byt
 {
     if (!error)
     {
-        {
-            std::lock_guard<std::mutex> l(read_queue_mutex_);
-            read_queue_.insert(read_queue_.begin(), buffer_.begin(), buffer_.begin() + bytes_transferred);
-        }
+        read_queue_.insert(read_queue_.begin(), buffer_.begin(), buffer_.begin() + bytes_transferred);
+        timeout_.cancel();
+    }
+}
 
-        serial_.async_read_some(
-            buffer(buffer_.data(), buffer_.size()),
-            boost::bind(&SerialPort::on_read, this, placeholders::error, placeholders::bytes_transferred));
+void SerialPort::on_timeout(const boost::system::error_code& error)
+{
+    if (!error)
+    {
+        serial_.cancel();
     }
 }
 

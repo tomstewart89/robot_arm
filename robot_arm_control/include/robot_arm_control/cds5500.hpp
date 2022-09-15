@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "robot_arm_control/serial_port.hpp"
 
 namespace robot_arm_control
@@ -75,34 +77,29 @@ class Cds5500
         SYNC_REG_WRITE = 132
     };
 
-    std::vector<uint8_t> packet_in_;
+    std::shared_ptr<SerialPort> serial_;
 
    public:
-    Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset);
+    Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset = 0.0);
 
+    bool ping();
     void set_led(const bool state);
-    void set_position(const double radians);
+    void queue_move(const double position, const double velocity = 0.0);
+    void execute();
 
-    void request_update();
-
-    std::shared_ptr<SerialPort> serial_;
     const std::string name_;
+
+    double get_position();
+
+   private:
     const uint8_t id_;
     const double offset_;
 
-    double get_position();
-    double get_velocity();
-    double get_effort();
+    static constexpr double max_position = 300.0 / 180.0 * M_PI;  // 300 degrees
+    static constexpr double max_velocity = M_PI / (0.18 * 3.0);   // 0.18 sec / 60 degrees
 
-    void on_read(const std::vector<uint8_t> &data);
-
-   private:
-    void send(const Instructions instruction, const ControlTableAddress start_address,
-              const std::vector<uint8_t> &parameters);
-
-    double position_;
-    double velocity_;
-    double effort_;
+    void send(const Instructions instruction, const std::vector<uint8_t> &parameters);
+    std::optional<std::vector<uint8_t>> receive();
 };
 
 }  // namespace robot_arm_control
