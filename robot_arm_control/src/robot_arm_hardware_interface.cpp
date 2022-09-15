@@ -78,7 +78,14 @@ hardware_interface::return_type RobotArmPositionOnlyHardware::read(const rclcpp:
 {
     for (std::size_t i = 0; i < servos_.size(); ++i)
     {
-        states_[i] = servos_[i].get_position();
+        try
+        {
+            states_[i] = servos_[i].get_position();
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+        }
     }
 
     return hardware_interface::return_type::OK;
@@ -88,11 +95,13 @@ hardware_interface::return_type RobotArmPositionOnlyHardware::write(const rclcpp
 {
     for (std::size_t i = 0; i < servos_.size(); ++i)
     {
-        servos_[i].queue_move(commands_[i], 0.5);
+        servos_[i].queue_move(commands_[i], 1.0);
     }
 
     broadcast_->execute();
-    servos_[0].ping();  // not clear why this is necessary but go figure.
+
+    // not clear why this is necessary, but without it get_position returns a weird status packet, so go figure.
+    servos_[0].ping();
 
     return hardware_interface::return_type::OK;
 }

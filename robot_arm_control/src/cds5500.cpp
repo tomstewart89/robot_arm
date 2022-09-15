@@ -17,9 +17,14 @@ double Cds5500::get_position()
 {
     send(Instructions::READ, {static_cast<uint8_t>(ControlTableAddress::PRESENT_POSITION_L), 2});
 
-    auto packet = *receive();
+    auto packet = receive();
 
-    return ((packet[5] | packet[6] << 8) - 512) * 300.0 * M_PI / 180.0 / 1024 - offset_;
+    if (!packet)
+    {
+        throw std::runtime_error("Couldn't read packet");
+    }
+
+    return (((*packet)[5] | (*packet)[6] << 8) - 512) * 300.0 * M_PI / 180.0 / 1024 - offset_;
 }
 
 bool Cds5500::ping()
