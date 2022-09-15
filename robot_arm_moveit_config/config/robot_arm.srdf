@@ -15,7 +15,7 @@
         <joint name="elbow"/>
         <joint name="wrist_theta"/>
         <joint name="wrist_psi"/>
-        <chain base_link="base" tip_link="fingers"/>
+        <chain base_link="base" tip_link="tcp_link"/>
     </group>
     <group name="gripper">
         <link name="fingers"/>

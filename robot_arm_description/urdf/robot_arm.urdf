@@ -84,6 +84,7 @@
             </geometry>
         </collision>
     </link>
+    <link name="tcp_link"/>
     <joint name="shoulder_psi" type="continuous">
         <parent link="base"/>
         <child link="upper_arm"/>
@@ -112,6 +113,12 @@
         <parent link="hand"/>
         <child link="fingers"/>
         <origin xyz="-0.0284 -0.013296 0.041274"/>
+        <axis xyz = "0 0 1"/>
+    </joint>
+    <joint name="tcp_joint" type="fixed">
+        <parent link="fingers"/>
+        <child link="tcp_link"/>
+        <origin xyz="0 0 0.06"/>
         <axis xyz = "0 0 1"/>
     </joint>
 </robot>
