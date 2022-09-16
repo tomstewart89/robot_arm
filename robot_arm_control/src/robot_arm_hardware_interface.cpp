@@ -62,13 +62,13 @@ hardware_interface::CallbackReturn RobotArmPositionOnlyHardware::on_init(const h
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        servos_.emplace_back(serial_, joint.name, std::stoi(joint.parameters.at("id")),
-                             std::stod(joint.parameters.at("offset")));
+        joints_.emplace_back(serial_, joint.name, std::stoi(joint.parameters.at("id")),
+                             std::stod(joint.parameters.at("offset")), std::stod(joint.parameters.at("multiplier")));
     }
 
-    for (std::size_t i = 0; i < servos_.size(); ++i)
+    for (std::size_t i = 0; i < joints_.size(); ++i)
     {
-        servos_[i].queue_move(commands_[i]);
+        joints_[i].queue_move(commands_[i]);
     }
 
     return hardware_interface::CallbackReturn::SUCCESS;
@@ -76,11 +76,11 @@ hardware_interface::CallbackReturn RobotArmPositionOnlyHardware::on_init(const h
 
 hardware_interface::return_type RobotArmPositionOnlyHardware::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
-    for (std::size_t i = 0; i < servos_.size(); ++i)
+    for (std::size_t i = 0; i < joints_.size(); ++i)
     {
         try
         {
-            states_[i] = servos_[i].get_position();
+            states_[i] = joints_[i].get_position();
         }
         catch (const std::exception &e)
         {
@@ -93,15 +93,15 @@ hardware_interface::return_type RobotArmPositionOnlyHardware::read(const rclcpp:
 
 hardware_interface::return_type RobotArmPositionOnlyHardware::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
-    for (std::size_t i = 0; i < servos_.size(); ++i)
+    for (std::size_t i = 0; i < joints_.size(); ++i)
     {
-        servos_[i].queue_move(commands_[i], 1.0);
+        joints_[i].queue_move(commands_[i]);
     }
 
     broadcast_->execute();
 
     // not clear why this is necessary, but without it get_position returns a weird status packet, so go figure.
-    servos_[0].ping();
+    joints_[0].ping();
 
     return hardware_interface::return_type::OK;
 }

@@ -80,7 +80,8 @@ class Cds5500
     std::shared_ptr<SerialPort> serial_;
 
    public:
-    Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset = 0.0);
+    Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset = 0.0,
+            const double multiplier = 1.0);
 
     bool ping();
     void set_led(const bool state);
@@ -94,6 +95,7 @@ class Cds5500
    private:
     const uint8_t id_;
     const double offset_;
+    const double multiplier_;
 
     static constexpr double max_position = 300.0 / 180.0 * M_PI;  // 300 degrees
     static constexpr double max_velocity = M_PI / (0.18 * 3.0);   // 0.18 sec / 60 degrees

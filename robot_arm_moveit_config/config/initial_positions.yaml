@@ -6,3 +6,4 @@ initial_positions:
   shoulder_theta: 0
   wrist_psi: 0
   wrist_theta: 0
+  left_knuckle: 0.03

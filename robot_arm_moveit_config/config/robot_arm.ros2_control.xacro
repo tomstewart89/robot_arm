@@ -5,14 +5,15 @@
 
         <ros2_control name="${name}" type="system">
             <hardware>
-                <!-- By default, set up controllers for simulation. This won't work on real hardware -->
                 <plugin>robot_arm_control/RobotArmPositionOnlyHardware</plugin>
                 <param name="port">/dev/serial/by-id/usb-FTDI_Toms_FTDI_Cable_A8WW0LV8-if00-port0</param>
                 <param name="baudrate">1000000</param>
+                <param name="gripper_rad_to_meters">0.026087183366811886</param>
             </hardware>
             <joint name="shoulder_psi">
                 <param name="id">16</param>
                 <param name="offset">0.0</param>
+                <param name="multiplier">1.0</param>
                 <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['shoulder_psi']}</param>
@@ -21,6 +22,7 @@
             <joint name="shoulder_theta">
               <param name="id">17</param>
               <param name="offset">0.04601942363656919</param>
+              <param name="multiplier">1.0</param>
               <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['shoulder_theta']}</param>
@@ -29,6 +31,7 @@
             <joint name="elbow">
                 <param name="id">18</param>
                 <param name="offset">-0.0869255779801863</param>
+                <param name="multiplier">1.0</param>
                 <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['elbow']}</param>
@@ -37,6 +40,7 @@
             <joint name="wrist_theta">
                 <param name="id">19</param>
                 <param name="offset">0.04090615434361711</param>
+                <param name="multiplier">1.0</param>
                 <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['wrist_theta']}</param>
@@ -45,10 +49,29 @@
             <joint name="wrist_psi">
                 <param name="id">20</param>
                 <param name="offset">0.20964404101103762</param>
+                <param name="multiplier">1.0</param>
                 <command_interface name="position"/>
                 <state_interface name="position">
                   <param name="initial_value">${initial_positions['wrist_psi']}</param>
                 </state_interface>
+            </joint>
+            <joint name="wrist_psi">
+              <param name="id">20</param>
+              <param name="offset">0.20964404101103762</param>
+              <param name="multiplier">1.0</param>
+              <command_interface name="position"/>
+              <state_interface name="position">
+                <param name="initial_value">${initial_positions['wrist_psi']}</param>
+              </state_interface>
+            </joint>
+            <joint name="left_knuckle">
+              <param name="id">21</param>
+              <param name="offset">-0.03443484</param>
+              <param name="multiplier">0.026087183366811886</param>
+              <command_interface name="position"/>
+              <state_interface name="position">
+                <param name="initial_value">${initial_positions['left_knuckle']}</param>
+              </state_interface>
             </joint>
         </ros2_control>
     </xacro:macro>

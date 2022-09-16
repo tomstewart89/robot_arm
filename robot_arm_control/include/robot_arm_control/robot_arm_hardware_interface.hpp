@@ -67,7 +67,8 @@ class RobotArmPositionOnlyHardware : public hardware_interface::SystemInterface
 
    private:
     std::shared_ptr<SerialPort> serial_;
-    std::vector<Cds5500> servos_;
+    std::vector<Cds5500> joints_;
+    std::vector<Cds5500> gripper_;
     std::unique_ptr<Cds5500> broadcast_;
 
     std::vector<double> commands_;

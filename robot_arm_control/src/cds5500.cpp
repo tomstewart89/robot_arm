@@ -8,8 +8,9 @@ using namespace boost::asio;
 
 namespace robot_arm_control
 {
-Cds5500::Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset)
-    : serial_(serial), name_(name), id_(id), offset_(offset)
+Cds5500::Cds5500(std::shared_ptr<SerialPort> serial, const std::string &name, const uint8_t id, const double offset,
+                 const double multiplier)
+    : serial_(serial), name_(name), id_(id), offset_(offset), multiplier_(multiplier)
 {
 }
 
@@ -24,7 +25,10 @@ double Cds5500::get_position()
         throw std::runtime_error("Couldn't read packet");
     }
 
-    return (((*packet)[5] | (*packet)[6] << 8) - 512) * 300.0 * M_PI / 180.0 / 1024 - offset_;
+    const uint16_t position_val = (*packet)[5] | (*packet)[6] << 8;
+    const double radians = (position_val - 512) * max_position / 1024;
+
+    return radians * multiplier_ - offset_;
 }
 
 bool Cds5500::ping()
@@ -46,7 +50,9 @@ void Cds5500::set_led(const bool state)
 
 void Cds5500::queue_move(const double position, const double velocity)
 {
-    uint16_t position_val = static_cast<uint16_t>((position + offset_) / max_position * 1024) + 512;
+    const double radians = (position + offset_) / multiplier_;
+
+    uint16_t position_val = static_cast<uint16_t>(radians / max_position * 1024) + 512;
     uint16_t velocity_val = static_cast<uint16_t>(velocity / max_velocity * 1024);
 
     send(Instructions::REG_WRITE, {static_cast<uint8_t>(ControlTableAddress::GOAL_POSITION_L),

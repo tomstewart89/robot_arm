@@ -70,17 +70,45 @@
             </geometry>
         </collision>
     </link>
-    <link name="fingers">
+    <link name="carpals">
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://robot_arm_description/models/fingers.stl"/>
+                <mesh filename="package://robot_arm_description/models/carpals.stl"/>
             </geometry>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://robot_arm_description/models/fingers.stl"/>
+                <mesh filename="package://robot_arm_description/models/carpals.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="left_finger">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/finger.stl"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/finger.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="right_finger">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 3.1415"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/finger.stl"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 3.1415"/>
+            <geometry>
+                <mesh filename="package://robot_arm_description/models/finger.stl"/>
             </geometry>
         </collision>
     </link>
@@ -111,14 +139,29 @@
     </joint>
     <joint name="wrist_psi" type="continuous">
         <parent link="hand"/>
-        <child link="fingers"/>
+        <child link="carpals"/>
         <origin xyz="-0.0284 -0.013296 0.041274"/>
         <axis xyz = "0 0 1"/>
     </joint>
     <joint name="tcp_joint" type="fixed">
-        <parent link="fingers"/>
+        <parent link="carpals"/>
         <child link="tcp_link"/>
         <origin xyz="0 0 0.06"/>
         <axis xyz = "0 0 1"/>
+    </joint>
+    <joint name="left_knuckle" type="prismatic">
+        <limit lower="0" upper="0.03" velocity="1" effort="1"/>
+        <parent link="carpals"/>
+        <child link="left_finger"/>
+        <origin xyz="0 0 0.031"/>
+        <axis xyz = "0 -1 0"/>
+    </joint>
+    <joint name="right_knuckle" type="prismatic">
+        <limit lower="0" upper="0.03" velocity="1" effort="1"/>
+        <mimic joint="left_knuckle"/>
+        <parent link="carpals"/>
+        <child link="right_finger"/>
+        <origin xyz="0 0 0.031"/>
+        <axis xyz = "0 1 0"/>
     </joint>
 </robot>

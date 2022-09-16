@@ -6,6 +6,9 @@ controller_manager:
     hand_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
@@ -17,6 +20,15 @@ hand_controller:
       - elbow
       - wrist_theta
       - wrist_psi
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+
+gripper_controller:
+  ros__parameters:
+    joints:
+      - left_knuckle
     command_interfaces:
       - position
     state_interfaces:
